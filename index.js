@@ -10,7 +10,6 @@ const port = process.env.PORT || 2917
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 const cors_origin = process.env.CORS_ORIGIN?.split(',')
-console.log(cors_origin)
 app.use(cors(
     { origin: cors_origin }
 ))
@@ -18,32 +17,33 @@ app.get("/", (req, res) => {
     res.send(`<a href='https://kabawat.com'>welcome to kabawat studio</a> <script>window.location.href = "https://kabawat.com"</script>`)
 })
 const server = http.createServer(app)
-const io = new Server(server, {
-    cors: {
-        origin: cors_origin
-    }
-})
+// const io = new Server(server, {
+//     cors: {
+//         origin: cors_origin
+//     }
+// })
 // socket data 
 const startSocketServer = () => {
-    console.log('socket function call')
-    io.on("connection", (socket) => {
-        // let connectedClients = {};
-        console.log("a user connected", socket.id);
-        // Listen for login event
-        socket.on('login', (data) => {
-            console.log("data : ", data)
-            // connectedClients[socket.id] = data?.username;
-            socket_login(socket, data)
-        });
+    console.log("here data")
+    // console.log('socket function call')
+    // io.on("connection", (socket) => {
+    //     // let connectedClients = {};
+    //     console.log("a user connected", socket.id);
+    //     // Listen for login event
+    //     socket.on('login', (data) => {
+    //         console.log("data : ", data)
+    //         // connectedClients[socket.id] = data?.username;
+    //         socket_login(socket, data)
+    //     });
 
-        // Listen for disconnect event
-        socket.on('disconnect', () => {
-            if (connectedClients[socket.id]) {
-                console.log(`${connectedClients[socket.id]} disconnected.`);
-                delete connectedClients[socket.id];
-            }
-        });
-    });
+    //     // Listen for disconnect event
+    //     socket.on('disconnect', () => {
+    //         if (connectedClients[socket.id]) {
+    //             console.log(`${connectedClients[socket.id]} disconnected.`);
+    //             delete connectedClients[socket.id];
+    //         }
+    //     });
+    // });
 };
 
 // server listen 

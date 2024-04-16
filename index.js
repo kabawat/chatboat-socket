@@ -10,8 +10,10 @@ const connectDB = require('#root/database/config')
 const port = process.env.PORT || 2917
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+const cors_origin = process.env.CORS_ORIGIN?.split(',')
+console.log(cors_origin)
 app.use(cors(
-    { origin: ['http://localhost:3000', ' http://127.0.0.1:3000', 'https://blissful-shadow-99347.pktriot.net'] }
+    { origin: cors_origin }
 ))
 app.get("/", (req, res) => {
     res.send(`<a href='https://kabawat.com'>welcome to kabawat studio</a> <script>window.location.href = "https://kabawat.com"</script>`)
@@ -20,9 +22,21 @@ const server = http.createServer(app)
 let connectedClients = {};
 const io = new Server(server, {
     cors: {
-        origin: ['http://localhost:3000', ' http://127.0.0.1:3000', 'https://blissful-shadow-99347.pktriot.net']
+        origin: cors_origin
     }
 })
+app.use(function (req, res, next) {
+    // res.header("Access-Control-Allow-Origin", "*");
+    const allowedOrigins = cors_origin;
+    const origin = req.headers.origin;
+    if (allowedOrigins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    }
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+    res.header("Access-Control-Allow-credentials", true);
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, UPDATE");
+    next();
+});
 
 // socket data 
 const startSocketServer = () => {

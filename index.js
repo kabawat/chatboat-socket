@@ -22,13 +22,15 @@ const io = new Server(server, {
         origin: cors_origin
     }
 })
-// socket data 
-const startSocketServer = () => {
-    console.log("here data")
-    // console.log('socket function call')
-    // io.on("connection", (socket) => {
+
+server.listen(port, async () => {
+    await connectDB()
+    console.log(`http://localhost:${port}`)
+})
+
+io.on("connection", (socket) => {
     //     // let connectedClients = {};
-    //     console.log("a user connected", socket.id);
+    console.log("a user connected", socket.id);
     //     // Listen for login event
     //     socket.on('login', (data) => {
     //         console.log("data : ", data)
@@ -43,12 +45,4 @@ const startSocketServer = () => {
     //             delete connectedClients[socket.id];
     //         }
     //     });
-    // });
-};
-
-// server listen 
-server.listen(port, async () => {
-    await connectDB()
-    startSocketServer()
-    console.log(`http://localhost:${port}`)
-})
+});

@@ -1,52 +1,21 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+require('dotenv').config();
+const { ENVIRONMENT, MONGODB_URI, MONGODB_URI_DEV } = process.env
+const URI = () => {
+    if (ENVIRONMENT == "dev") return MONGODB_URI_DEV
+    else return MONGODB_URI;
+}
 
-const userSchema = new mongoose.Schema({
-    username: {
-        type: String,
-        unique: true,
-        required: true
-    },
-    password: {
-        type: String,
-        required: true,
-    },
-    email: {
-        type: String,
-        unique: true,
-        required: true
-    },
-    contacts: [
-        {
-            type: mongoose.SchemaTypes.ObjectId,
-            ref: "User"
-        }
-    ],
-    firstName: String,
-    lastName: String,
-    dateOfBirth: Date,
-    phoneNumber: String,
-    about: {
-        type: String,
-        default: "I'm Using Query Boat"
-    },
-    otp: String, // one time password for verification of the account
-    isVerified: {
-        type: Boolean,
-        default: false
-    },
-    disabled: {
-        type: Boolean,
-        default: false
-    },
-    profilePicture: {
-        asset_id: String,
-        public_id: String,
-        secure_url: String
-    },
-    token: String,
-    socketId: String
+const connectDB = async () => {
+    try {
+        mongoose.connect(URI()).then((res) => {
+            console.log('MongoDB connected successfully');
+        }).catch((err) => {
+            console.log('Error connecting to MongoDB:', err);
+        });
+    } catch (error) {
+        // Handle any unexpected errors (though in this example, it's an empty block)
+    }
+};
 
-}, { timestamps: true })
-
-const userModal = mongoose.model("User", userSchema)
-module.exports = userModal;
+module.exports = connectDB;

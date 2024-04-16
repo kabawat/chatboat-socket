@@ -23,21 +23,9 @@ const io = new Server(server, {
         origin: cors_origin
     }
 })
-app.use(function (req, res, next) {
-    // res.header("Access-Control-Allow-Origin", "*");
-    const allowedOrigins = cors_origin;
-    const origin = req.headers.origin;
-    if (allowedOrigins.includes(origin)) {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-    }
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-    // res.header("Access-Control-Allow-credentials", true);
-    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, UPDATE");
-    next();
-});
-
 // socket data 
 const startSocketServer = () => {
+    console.log('socket function call')
     io.on("connection", (socket) => {
         // let connectedClients = {};
         console.log("a user connected", socket.id);

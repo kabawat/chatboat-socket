@@ -17,11 +17,11 @@ app.get("/", (req, res) => {
     res.send(`<a href='https://kabawat.com'>welcome to kabawat studio</a> <script>window.location.href = "https://kabawat.com"</script>`)
 })
 const server = http.createServer(app)
-// const io = new Server(server, {
-//     cors: {
-//         origin: cors_origin
-//     }
-// })
+const io = new Server(server, {
+    cors: {
+        origin: cors_origin
+    }
+})
 // socket data 
 const startSocketServer = () => {
     console.log("here data")

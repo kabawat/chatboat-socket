@@ -32,17 +32,17 @@ io.on("connection", (socket) => {
     //     // let connectedClients = {};
     console.log("a user connected", socket.id);
     //     // Listen for login event
-    //     socket.on('login', (data) => {
-    //         console.log("data : ", data)
-    //         // connectedClients[socket.id] = data?.username;
-    //         socket_login(socket, data)
-    //     });
+        socket.on('login', (data) => {
+            console.log("data : ", data)
+            // connectedClients[socket.id] = data?.username;
+            socket_login(socket, data)
+        });
 
     //     // Listen for disconnect event
-    //     socket.on('disconnect', () => {
-    //         if (connectedClients[socket.id]) {
-    //             console.log(`${connectedClients[socket.id]} disconnected.`);
-    //             delete connectedClients[socket.id];
-    //         }
-    //     });
+        socket.on('disconnect', () => {
+            // if (connectedClients[socket.id]) {
+            //     console.log(`${connectedClients[socket.id]} disconnected.`);
+            //     delete connectedClients[socket.id];
+            // }
+        });
 });

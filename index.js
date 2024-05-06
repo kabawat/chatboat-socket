@@ -6,6 +6,7 @@ const dot = require('dotenv').config()
 const cors = require('cors')
 const socket_login = require('#root/controller/login')
 const connectDB = require('#root/database/config')
+const userModal = require('#root/database/user')
 const port = process.env.PORT || 2917
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -29,20 +30,32 @@ server.listen(port, async () => {
 })
 
 io.on("connection", (socket) => {
-    //     // let connectedClients = {};
+    let connectedClients = {};
     console.log("a user connected", socket.id);
-    //     // Listen for login event
-        socket.on('login', (data) => {
-            console.log("data : ", data)
-            // connectedClients[socket.id] = data?.username;
-            socket_login(socket, data)
-        });
+    socket.on('login', (data) => {
+        connectedClients[socket.id] = data?.username;
+        socket_login(socket, data)
+    });
 
-    //     // Listen for disconnect event
-        socket.on('disconnect', () => {
-            // if (connectedClients[socket.id]) {
-            //     console.log(`${connectedClients[socket.id]} disconnected.`);
-            //     delete connectedClients[socket.id];
-            // }
-        });
+    socket.on('send text', data => {
+        console.log("send text : ", data)
+        findUser(data?.id).then((res) => {
+            console.log("res : ", res)
+        })
+        // io.to()
+    })
+    // Listen for disconnect event
+    socket.on('disconnect', () => {
+        if (connectedClients[socket.id]) {
+            console.log(`${connectedClients[socket.id]} disconnected.`);
+            delete connectedClients[socket.id];
+        }
+    });
 });
+
+
+
+async function findUser(_id) {
+    const user = await userModal.findOne({ _id }, 'socketId')
+    return user.socketId
+}

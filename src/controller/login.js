@@ -1,4 +1,4 @@
-const userModal = require("#root/database/user")
+const userModal = require("#root/database/model/user")
 
 async function socket_login(socket, data) {
     try {

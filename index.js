@@ -6,7 +6,7 @@ const dot = require('dotenv').config()
 const cors = require('cors')
 const socket_login = require('#root/controller/login')
 const connectDB = require('#root/database/config')
-const userModal = require('#root/database/user')
+const send_text_message = require('#root/controller/send_message/send_text_message')
 const port = process.env.PORT || 2917
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -38,11 +38,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on('send text', data => {
-        console.log("send text : ", data)
-        findUser(data?.id).then((res) => {
-            console.log("res : ", res)
-        })
-        // io.to()
+        send_text_message(data, io)
     })
     // Listen for disconnect event
     socket.on('disconnect', () => {
@@ -52,10 +48,3 @@ io.on("connection", (socket) => {
         }
     });
 });
-
-
-
-async function findUser(_id) {
-    const user = await userModal.findOne({ _id }, 'socketId')
-    return user.socketId
-}

@@ -19,7 +19,7 @@ const chatSchema = new mongoose.Schema({
     pdf: String,
     audio: String,
     voice: String,
-    unread: [
+    mark_as_read: [
         {
             type: mongoose.SchemaTypes.ObjectId,
             ref: "User"

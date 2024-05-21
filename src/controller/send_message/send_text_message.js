@@ -8,7 +8,6 @@ async function send_text_message(data, io) {
 
         // Check if the chat_id exists in the user's contacts
         const exists = user.contacts.some(item => item == data?.chat_id);
-
         // If chat_id does not exist in contacts, add it
         if (!exists) {
             const contactList = [...user.contacts, data?.chat_id];
@@ -28,6 +27,7 @@ async function send_text_message(data, io) {
         const resData = await chat_format.save();
 
         // Emit event to sender's socket that message is received
+        console.log("user?.socketId : ", user?.socketId)
         io.to(user?.socketId).emit("received text", resData);
     } catch (error) {
         console.error("Error sending text message:", error);
@@ -36,3 +36,5 @@ async function send_text_message(data, io) {
 }
 
 module.exports = send_text_message;
+
+

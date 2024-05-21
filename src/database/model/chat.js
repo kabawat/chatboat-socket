@@ -24,6 +24,12 @@ const chatSchema = new mongoose.Schema({
             type: mongoose.SchemaTypes.ObjectId,
             ref: "User"
         }
+    ],
+    delete_from: [
+        {
+            type: mongoose.SchemaTypes.ObjectId,
+            ref: "User"
+        }
     ]
 
 }, { timestamps: true })

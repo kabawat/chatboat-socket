@@ -7,6 +7,7 @@ const cors = require('cors')
 const socket_login = require('#root/controller/login')
 const connectDB = require('#root/database/config')
 const send_text_message = require('#root/controller/send_message/send_text_message')
+const user_typing = require('#root/controller/send_message/user_typing')
 const port = process.env.PORT || 2917
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -39,6 +40,10 @@ io.on("connection", (socket) => {
 
     socket.on('send text', data => {
         send_text_message(data, io)
+    })
+
+    socket.on('typing', data => {
+        user_typing(data, io)
     })
     // Listen for disconnect event
     socket.on('disconnect', () => {

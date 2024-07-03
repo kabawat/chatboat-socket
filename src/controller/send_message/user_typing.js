@@ -1,4 +1,3 @@
-const chatModal = require("#root/database/model/chat");
 const userModal = require("#root/database/model/user");
 const mongoose = require('mongoose')
 async function user_typing(data, io) {

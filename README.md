@@ -40,5 +40,5 @@ on window
 
 
 # start project 
---> run command "WSL" terminal  "redis-cli ping"
---> run comman any terminal "nodemon" or "node index.js"
+1. --> run command "WSL" terminal  "redis-cli ping"
+2. --> run comman any terminal "nodemon" or "node index.js"

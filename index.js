@@ -1,14 +1,15 @@
+require('dotenv').config()
 const express = require('express')
 const http = require('http')
 const { Server } = require('socket.io')
 const app = express()
-const dot = require('dotenv').config()
 const cors = require('cors')
 const socket_login = require('#root/controller/login')
 const connectDB = require('#root/database/config')
 const send_text_message = require('#root/controller/send_message/send_text_message')
 const user_typing = require('#root/controller/send_message/user_typing')
 const handle_block_user = require('#root/controller/user/handle_block_user')
+const client = require('#root/configs/redis')
 const port = process.env.PORT || 2917
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -32,10 +33,8 @@ server.listen(port, async () => {
 })
 
 io.on("connection", (socket) => {
-    let connectedClients = {};
-    console.log("a user connected", socket.id);
-    socket.on('login', (data) => {
-        connectedClients[socket.id] = data?.username;
+    // let connectedClients = {};
+    socket.on('login', async (data) => {
         socket_login(socket, data)
     });
 
@@ -52,10 +51,8 @@ io.on("connection", (socket) => {
         handle_block_user(data, io)
     })
     // Listen for disconnect event
-    socket.on('disconnect', () => {
-        if (connectedClients[socket.id]) {
-            console.log(`${connectedClients[socket.id]} disconnected.`);
-            delete connectedClients[socket.id];
-        }
+    socket.on('disconnect', async (data) => {
+        // await client.delete(data?.username)
+        console.log(`${socket.id} disconnected.`);
     });
 });

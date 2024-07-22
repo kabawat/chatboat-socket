@@ -1,10 +1,11 @@
+const client = require("#root/configs/redis");
 const chatModal = require("#root/database/model/chat");
 const userModal = require("#root/database/model/user");
 
 async function send_text_message(data, io) {
     try {
         // Find the user to get socketId and contacts
-        const user = await userModal.findOne({ _id: data?.receiver }, 'socketId contacts');
+        const user = await userModal.findOne({ _id: data?.receiver }, 'socketId contacts username');
 
         // Check if the chat_id exists in the user's contacts
         const exists = user.contacts.some(item => item == data?.chat_id);
@@ -26,9 +27,10 @@ async function send_text_message(data, io) {
         // Save the chat message
         const resData = await chat_format.save();
 
+        receievr = await client.get(user?.username)
         // Emit event to sender's socket that message is received
         console.log("user?.socketId : ", user?.socketId)
-        io.to(user?.socketId).emit("received text", resData);
+        io.to(receievr).emit("received text", resData);
     } catch (error) {
         console.error("Error sending text message:", error);
         // Handle error

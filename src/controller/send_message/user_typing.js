@@ -1,11 +1,10 @@
-const userModal = require("#root/database/model/user");
-const mongoose = require('mongoose')
+const client = require("#root/configs/redis");
 async function user_typing(data, io) {
     try {
         // Find the user to get socketId and contacts
-        const user = await userModal.findOne({ _id: new mongoose.Types.ObjectId(data?.receiver) }, 'socketId contacts');
-        if (user) {
-            io.to(user?.socketId).emit("typing", data);
+        const receiver = await client.get(data.username)
+        if (receiver) {
+            io.to(receiver).emit("typing", data);
         }
 
     } catch (error) {

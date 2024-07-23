@@ -1,8 +1,8 @@
-const userModal = require("#root/database/model/user")
+const client = require("#root/configs/redis")
 
 async function socket_login(socket, data) {
     try {
-        const res = await userModal.updateOne({ _id: data?._id }, { socketId: socket.id })
+        await client.set(data?.username, socket.id)
         socket.broadcast.emit('joined', {
             message: `${data.username} online`
         })

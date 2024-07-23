@@ -1,28 +1,35 @@
+const SECRET = require('#root/configs/env')
 const express = require('express')
 const http = require('http')
+const jwt = require('jsonwebtoken')
 const { Server } = require('socket.io')
 const app = express()
-const dot = require('dotenv').config()
 const cors = require('cors')
-const socket_login = require('#root/controller/login')
-const connectDB = require('#root/database/config')
+
 const send_text_message = require('#root/controller/send_message/send_text_message')
-const user_typing = require('#root/controller/send_message/user_typing')
 const handle_block_user = require('#root/controller/user/handle_block_user')
-const port = process.env.PORT || 2917
+const socket_login = require('#root/controller/login')
+const user_typing = require('#root/controller/send_message/user_typing')
+const connectDB = require('#root/database/config')
+const router = require('#root/routers/router')
+const userModal = require('#root/database/model/user')
+
+const port = SECRET?.PORT || 2917
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-const cors_origin = process.env.CORS_ORIGIN?.split(',')
+const cors_origin = SECRET?.CORS_ORIGIN?.split(',')
 app.use(cors(
-    { origin: cors_origin }
+    { origin: "*" }
+    // { origin: cors_origin }
 ))
-app.get("/", (req, res) => {
-    res.send(`<a href='https://kabawat.com'>welcome to kabawat studio</a> <script>window.location.href = "https://kabawat.com"</script>`)
-})
+
+app.use(router)
+
 const server = http.createServer(app)
 const io = new Server(server, {
     cors: {
-        origin: cors_origin
+        origin: "*"
+        // origin: cors_origin
     }
 })
 
@@ -30,12 +37,36 @@ server.listen(port, async () => {
     await connectDB()
     console.log(`http://localhost:${port}`)
 })
+// Set up Socket.IO
+io.use((socket, next) => {
+    const token = socket.handshake.query.token;
+    if (!token) {
+        return next(new Error('No token provided'));
+    }
+    jwt.verify(token, SECRET?.JWT_SECRET, (err, decoded) => {
+        if (err) {
+            return next(new Error('Invalid token'));
+        }
+        const username = decoded.username;
+
+        // Check if username exists and is verified
+        userModal.findOne({ username: username, isVerified: true }).then((user) => {
+            if (!user) {
+                return next(new Error('Username not found or not verified'));
+            }
+            socket.username = username;
+            socket.socketId = decoded.socketId;
+            next();
+        });
+    });
+});
 
 io.on("connection", (socket) => {
-    let connectedClients = {};
-    console.log("a user connected", socket.id);
-    socket.on('login', (data) => {
-        connectedClients[socket.id] = data?.username;
+    const token = jwt.sign({ username: socket.username, socketId: socket.id }, SECRET.JWT_SECRET, { expiresIn: '365d' });
+    io.to(socket.id).emit('token', token) // return token to client
+
+    // user connect
+    socket.on('login', async (data) => {
         socket_login(socket, data)
     });
 
@@ -52,10 +83,7 @@ io.on("connection", (socket) => {
         handle_block_user(data, io)
     })
     // Listen for disconnect event
-    socket.on('disconnect', () => {
-        if (connectedClients[socket.id]) {
-            console.log(`${connectedClients[socket.id]} disconnected.`);
-            delete connectedClients[socket.id];
-        }
+    socket.on('disconnect', async (data) => {
+        console.log(`${socket.id} disconnected.`);
     });
 });

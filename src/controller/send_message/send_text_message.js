@@ -29,7 +29,6 @@ async function send_text_message(data, io) {
 
         receievr = await client.get(user?.username)
         // Emit event to sender's socket that message is received
-        console.log("user?.socketId : ", user?.socketId)
         io.to(receievr).emit("received text", resData);
     } catch (error) {
         console.error("Error sending text message:", error);

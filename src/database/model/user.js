@@ -43,8 +43,12 @@ const userSchema = new mongoose.Schema({
         public_id: String,
         secure_url: String
     },
-    token: String,
-    socketId: String
+    isOnline: {
+        type: Boolean,
+    },
+    lastSeen: {
+        type: Date,
+    }
 
 }, { timestamps: true })
 

@@ -11,8 +11,9 @@ const handle_block_user = require('#root/controller/user/handle_block_user')
 const socket_login = require('#root/controller/login')
 const user_typing = require('#root/controller/send_message/user_typing')
 const connectDB = require('#root/database/config')
-const router = require('#root/routers/router')
 const userModal = require('#root/database/model/user')
+const mongoose = require('mongoose')
+const router = require('#root/routers/router')
 
 const port = SECRET?.PORT || 2917
 app.use(express.json())
@@ -55,6 +56,7 @@ io.use((socket, next) => {
                 return next(new Error('Username not found or not verified'));
             }
             socket.username = username;
+            socket.user_id = decoded?.user_id
             socket.socketId = decoded.socketId;
             next();
         });
@@ -62,7 +64,7 @@ io.use((socket, next) => {
 });
 
 io.on("connection", (socket) => {
-    const token = jwt.sign({ username: socket.username, socketId: socket.id }, SECRET.JWT_SECRET, { expiresIn: '365d' });
+    const token = jwt.sign({ username: socket.username, user_id: socket.user_id, socketId: socket.id }, SECRET.JWT_SECRET, { expiresIn: '365d' });
     io.to(socket.id).emit('token', token) // return token to client
 
     // user connect
@@ -83,7 +85,22 @@ io.on("connection", (socket) => {
         handle_block_user(data, io)
     })
     // Listen for disconnect event
-    socket.on('disconnect', async (data) => {
-        console.log(`${socket.id} disconnected.`);
-    });
+    socket.on('disconnect', async () => {
+        try {
+            const lastSeen = new Date()
+            socket.broadcast.emit("offline", {
+                username: socket.username,
+                user_id: socket?.user_id,
+                isOnline: false,
+                lastSeen
+            })
+            await userModal.updateOne({ _id: new mongoose.Types.ObjectId(socket?.user_id) }, {
+                isOnline: false,
+                lastSeen,
+            })
+            console.log(`${socket.id} disconnected. Last seen updated for user ${socket.username} at ${lastSeen}`)
+        } catch (error) {
+            console.log(error)
+        }
+    })
 });

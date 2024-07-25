@@ -4,8 +4,8 @@ const mongoose = require("mongoose")
 
 async function socket_login(socket, data) {
     try {
-        await client.set(data?.username, socket.id)
         const user = await userModal.findById(socket?.user_id)
+        await client.set(`user${user?._id}`, socket.id)
         user.isOnline = true
         user.lastSeen = new Date()
         await user.save()

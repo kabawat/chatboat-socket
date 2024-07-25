@@ -21,7 +21,7 @@ async function socket_token(req, res) {
         }
 
         // Generate JWT token
-        const token = jwt.sign({ username: user.username, socketId: null }, SECRET.JWT_SECRET, { expiresIn: '365d' });
+        const token = jwt.sign({ username: user.username, user_id: user?._id, socketId: null }, SECRET.JWT_SECRET, { expiresIn: '365d' });
 
         // Respond with success message and token
         res.status(200).json({

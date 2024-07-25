@@ -16,7 +16,7 @@ async function handle_block_user(data, io) {
             } else {
                 res_contact.blocked_by = res_contact.blocked_by.filter(id => `${id}` != `${data.blocked_by}`)
             }
-            const receiver = await client.get(blocking_user.username)
+            const receiver = await client.get(`user${blocking_user?._id}`)
             await res_contact.save()
             io.to(receiver).emit("blocked user", data);
         }

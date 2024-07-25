@@ -27,7 +27,7 @@ async function send_text_message(data, io) {
         // Save the chat message
         const resData = await chat_format.save();
 
-        receievr = await client.get(user?.username)
+        receievr = await client.get(`user${user?._id}`)
         // Emit event to sender's socket that message is received
         io.to(receievr).emit("received text", resData);
     } catch (error) {
